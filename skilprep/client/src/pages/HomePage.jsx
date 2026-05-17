@@ -1,6 +1,22 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { motion } from 'framer-motion';
+
+const fadeInUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
 
 export default function HomePage() {
   const { user } = useAuth();
@@ -12,11 +28,11 @@ export default function HomePage() {
   }, []);
 
   const fields = [
-    { name: 'Coding (DSA)', icon: '{ }', color: 'bg-blue-100 text-blue-700' },
-    { name: 'Mathematics', icon: '∑', color: 'bg-purple-100 text-purple-700' },
-    { name: 'Science', icon: '⚛', color: 'bg-green-100 text-green-700' },
-    { name: 'Logic & Puzzles', icon: '◈', color: 'bg-amber-100 text-amber-700' },
-    { name: 'General Knowledge', icon: '?', color: 'bg-rose-100 text-rose-700' },
+    { name: 'Coding (DSA)', icon: '{ }', color: 'bg-blue-500/20 text-blue-300' },
+    { name: 'Mathematics', icon: '∑', color: 'bg-purple-500/20 text-purple-300' },
+    { name: 'Science', icon: '⚛', color: 'bg-emerald-500/20 text-emerald-300' },
+    { name: 'Logic & Puzzles', icon: '◈', color: 'bg-amber-500/20 text-amber-300' },
+    { name: 'General Knowledge', icon: '?', color: 'bg-rose-500/20 text-rose-300' },
   ];
 
   const aboutText = 'SkillPrep is an innovative, multi-disciplinary evaluation platform designed to bridge the gap between niche coding platforms and generalized learning management systems. While platforms like LeetCode focus exclusively on algorithmic proficiency in computer science, SkillPrep introduces a unified architecture capable of evaluating skills across Computer Science, Management, Commerce, and Arts. By utilizing domain-specific evaluation engines ranging from automated test-case executors to rubric-based assessment models, SkillPrep provides a holistic evaluation environment. This report details the design, architecture, and implementation of SkillPrep, highlighting its secure authentication, real-time feedback mechanisms, and optimized data structure utilization.';
@@ -44,7 +60,6 @@ export default function HomePage() {
       title: 'Team',
       label: 'Team Name',
       value: 'Zpreps',
-      delay: null,
     },
     {
       id: 'contact',
@@ -52,27 +67,39 @@ export default function HomePage() {
       label: 'Phone',
       value: '7828969147',
       href: 'tel:7828969147',
-      delay: '120ms',
     },
   ];
 
-  const sectionLinkClass = 'inline-block rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 no-underline hover:border-teal-300 hover:text-teal-700 transition-colors';
-  const ctaPrimaryClass = 'inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-7 py-3 rounded-lg text-lg font-medium no-underline transition-colors';
-  const ctaSecondaryClass = 'inline-block border border-gray-300 hover:border-gray-400 text-gray-700 bg-white px-7 py-3 rounded-lg text-lg font-medium no-underline transition-colors';
+  const sectionLinkClass = 'inline-block rounded-full border border-white/20 bg-white/5 backdrop-blur-md px-5 py-2.5 text-sm font-medium text-white no-underline hover:border-teal-400 hover:text-teal-300 transition-all duration-300 hover:bg-white/10';
+  const ctaPrimaryClass = 'inline-block bg-indigo-500 hover:bg-indigo-400 text-white px-8 py-3.5 rounded-xl text-lg font-medium no-underline transition-all duration-300 shadow-[0_0_20px_rgba(99,102,241,0.4)] hover:shadow-[0_0_30px_rgba(99,102,241,0.6)] hover:-translate-y-1';
+  const ctaSecondaryClass = 'inline-block border border-white/30 hover:border-white/60 text-white bg-white/5 backdrop-blur-md px-8 py-3.5 rounded-xl text-lg font-medium no-underline transition-all duration-300 hover:-translate-y-1 hover:bg-white/10';
 
   return (
-    <div className="py-12 md:py-16 space-y-10 md:space-y-12">
+    <motion.div 
+      initial="hidden" 
+      animate="visible" 
+      className="py-12 md:py-16 space-y-16 md:space-y-24"
+    >
       {showPopup && (
-        <div className="popup-overlay" role="dialog" aria-modal="true" aria-label="Welcome popup">
-          <div className="popup-card premium-shell">
-            <h3 className="premium-heading text-xl font-bold text-slate-900">Welcome to SkillPrep</h3>
-            <p className="text-sm text-slate-600 mt-2">
-              Explore coding, math, science, and more with real-time evaluation, progress tracking, and interactive practice.
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4"
+        >
+          <motion.div 
+            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            className="max-w-lg w-full bg-slate-900/80 border border-white/10 shadow-2xl rounded-2xl backdrop-blur-xl p-8"
+          >
+            <h3 className="text-2xl font-bold text-white mb-3">Welcome to SkillPrep</h3>
+            <p className="text-slate-300 leading-relaxed mb-6">
+              Explore coding, math, science, and more with real-time evaluation, progress tracking, and interactive practice. Experience our new 3D platform.
             </p>
-            <div className="mt-4 flex items-center gap-2">
+            <div className="flex items-center gap-4">
               <Link
                 to="/problems"
-                className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium no-underline transition-colors"
+                className="bg-teal-500 hover:bg-teal-400 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-lg shadow-teal-500/30"
                 onClick={() => setShowPopup(false)}
               >
                 Start Practicing
@@ -80,25 +107,29 @@ export default function HomePage() {
               <button
                 type="button"
                 onClick={() => setShowPopup(false)}
-                className="inline-block border border-slate-300 hover:border-slate-400 text-slate-700 bg-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                className="border border-white/20 hover:bg-white/10 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors"
               >
                 Close
               </button>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
 
-      <section className="premium-shell px-6 py-10 md:px-10 md:py-14 text-center reveal-up">
-        <p className="text-xs uppercase tracking-[0.2em] text-teal-700 font-semibold">Platform</p>
-        <h2 className="premium-heading text-4xl md:text-5xl font-bold text-gray-900 mt-3">
+      <motion.section 
+        variants={fadeInUp}
+        className="premium-shell px-6 py-16 md:px-12 md:py-20 text-center relative overflow-hidden"
+      >
+        <div className="absolute inset-0 bg-gradient-to-b from-teal-500/10 to-transparent pointer-events-none rounded-2xl"></div>
+        <p className="text-sm uppercase tracking-[0.3em] text-teal-400 font-bold mb-4">Platform</p>
+        <h2 className="premium-heading text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-slate-400 mt-2 mb-6 drop-shadow-sm">
           Master Skills Across Disciplines
         </h2>
-        <p className="text-lg text-gray-600 mt-4 max-w-3xl mx-auto">
-          Practice coding, math, science, logic and more. Track your progress, compete on leaderboards, and level up your skills.
+        <p className="text-xl text-slate-300 mt-6 max-w-3xl mx-auto leading-relaxed">
+          Practice coding, math, science, logic and more. Track your progress, compete on leaderboards, and level up your skills in an immersive environment.
         </p>
 
-        <div className="mt-6 flex items-center justify-center gap-2 flex-wrap">
+        <div className="mt-10 flex items-center justify-center gap-4 flex-wrap relative z-10">
           {sectionLinks.map((item) => (
             <a key={item.href} href={item.href} className={sectionLinkClass}>
               {item.label}
@@ -106,57 +137,77 @@ export default function HomePage() {
           ))}
         </div>
 
-        <div className="mt-8 flex items-center justify-center gap-3 flex-wrap">
+        <div className="mt-12 flex items-center justify-center gap-5 flex-wrap relative z-10">
           {ctaLinks.map((item) => (
             <Link key={item.to} to={item.to} className={item.primary ? ctaPrimaryClass : ctaSecondaryClass}>
               {item.label}
             </Link>
           ))}
         </div>
-      </section>
+      </motion.section>
 
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 reveal-up">
-        {fields.map((f, index) => (
-          <Link
-            key={f.name}
-            to="/problems"
-            className="bg-white rounded-xl shadow p-6 hover:shadow-md transition-shadow no-underline group floating-card"
-            style={{ animationDelay: `${index * 90}ms` }}
-          >
-            <div className={`w-12 h-12 rounded-lg ${f.color} flex items-center justify-center text-xl font-bold mb-3`}>
-              {f.icon}
-            </div>
-            <h3 className="font-semibold text-gray-800 group-hover:text-indigo-600 transition-colors">{f.name}</h3>
-            <p className="text-sm text-gray-500 mt-2">Explore tailored challenges and adaptive evaluation.</p>
-          </Link>
+      <motion.section 
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+      >
+        {fields.map((f) => (
+          <motion.div variants={fadeInUp} key={f.name}>
+            <Link
+              to="/problems"
+              className="block premium-shell p-8 hover:bg-white/10 transition-all duration-300 group cursor-pointer hover:-translate-y-2 hover:shadow-[0_15px_30px_rgba(0,0,0,0.4)]"
+            >
+              <div className={`w-14 h-14 rounded-xl ${f.color} flex items-center justify-center text-2xl font-bold mb-5 shadow-lg`}>
+                {f.icon}
+              </div>
+              <h3 className="font-bold text-xl text-white group-hover:text-teal-300 transition-colors mb-3">{f.name}</h3>
+              <p className="text-sm text-slate-400 leading-relaxed">Explore tailored challenges and adaptive evaluation across this exciting discipline.</p>
+            </Link>
+          </motion.div>
         ))}
-      </section>
+      </motion.section>
 
-      <section id="know-about" className="premium-shell p-6 md:p-8 reveal-up scroll-mt-24">
-        <h3 className="premium-heading text-2xl font-bold text-slate-900">Know About SkillPrep</h3>
-        <p className="text-slate-600 mt-4 leading-7">{aboutText}</p>
-      </section>
+      <motion.section 
+        variants={fadeInUp}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        id="know-about" 
+        className="premium-shell p-8 md:p-12 scroll-mt-32 relative overflow-hidden"
+      >
+        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl"></div>
+        <h3 className="premium-heading text-3xl font-bold text-white mb-6 relative z-10">Know About SkillPrep</h3>
+        <p className="text-slate-300 text-lg leading-loose relative z-10">{aboutText}</p>
+      </motion.section>
 
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-6 reveal-up">
+      <motion.section 
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        className="grid grid-cols-1 md:grid-cols-2 gap-8"
+      >
         {infoCards.map((card) => (
-          <div
+          <motion.div
+            variants={fadeInUp}
             key={card.id}
             id={card.id}
-            className="premium-shell p-6 md:p-7 section-pulse scroll-mt-24"
-            style={card.delay ? { animationDelay: card.delay } : undefined}
+            className="premium-shell p-8 md:p-10 scroll-mt-32 hover:bg-white/10 transition-colors duration-300"
           >
-            <h3 className="premium-heading text-2xl font-bold text-slate-900">{card.title}</h3>
-            <p className="text-slate-600 mt-3">{card.label}</p>
+            <h3 className="premium-heading text-2xl font-bold text-white mb-2">{card.title}</h3>
+            <p className="text-slate-400 mb-4 font-medium uppercase tracking-wider text-xs">{card.label}</p>
             {card.href ? (
-              <a href={card.href} className="text-xl font-semibold text-teal-700 hover:text-teal-800 no-underline mt-1 inline-block">
+              <a href={card.href} className="text-3xl font-bold text-teal-400 hover:text-teal-300 transition-colors">
                 {card.value}
               </a>
             ) : (
-              <p className="text-xl font-semibold text-slate-900 mt-1">{card.value}</p>
+              <p className="text-3xl font-bold text-white">{card.value}</p>
             )}
-          </div>
+          </motion.div>
         ))}
-      </section>
-    </div>
+      </motion.section>
+    </motion.div>
   );
 }
