@@ -1,7 +1,7 @@
 {
   "name": "skilprep",
   "version": "1.0.0",
-  "description": "Multi-discipline challenge platform",
+  "description": "SkilPrep multi-discipline challenge platform",
   "scripts": {
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "server": "cd server && npm run dev",
