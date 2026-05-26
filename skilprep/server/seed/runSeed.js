@@ -1,10 +1,18 @@
 require('dotenv').config();
+const fs = require('fs');
+const path = require('path');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const User = require('../src/models/User');
 const Field = require('../src/models/Field');
 const Problem = require('../src/models/Problem');
 const TestCase = require('../src/models/TestCase');
+const Submission = require('../src/models/Submission');
+const Comment = require('../src/models/Comment');
+const Community = require('../src/models/Community');
+const CommunityTest = require('../src/models/CommunityTest');
+const CommunitySubmission = require('../src/models/CommunitySubmission');
+const CommunityResource = require('../src/models/CommunityResource');
 
 async function seed() {
   await mongoose.connect(process.env.MONGO_URI);
@@ -16,17 +24,68 @@ async function seed() {
     Field.deleteMany({}),
     Problem.deleteMany({}),
     TestCase.deleteMany({}),
+    Submission.deleteMany({}),
+    Comment.deleteMany({}),
+    Community.deleteMany({}),
+    CommunityTest.deleteMany({}),
+    CommunitySubmission.deleteMany({}),
+    CommunityResource.deleteMany({}),
   ]);
   console.log('Cleared existing data');
 
-  // Create admin user
-  const admin = await User.create({
-    username: 'admin',
-    email: 'admin@skilprep.local',
-    passwordHash: 'admin123',
-    role: 'admin',
-  });
-  console.log('Admin created: admin@skilprep.local / admin123');
+  // Create presentation users
+  const seededUsers = await User.insertMany([
+    {
+      username: 'admin',
+      email: 'admin@skilprep.local',
+      passwordHash: await bcrypt.hash('admin123', 12),
+      role: 'admin',
+      bio: 'Platform administrator account for demos',
+      avatar: 'https://api.dicebear.com/8.x/bottts/svg?seed=admin',
+    },
+    {
+      username: 'alice_dev',
+      email: 'alice@skilprep.local',
+      passwordHash: await bcrypt.hash('demo1234', 12),
+      role: 'user',
+      bio: 'Competitive programmer focusing on algorithms',
+      avatar: 'https://api.dicebear.com/8.x/adventurer/svg?seed=alice',
+    },
+    {
+      username: 'bob_math',
+      email: 'bob@skilprep.local',
+      passwordHash: await bcrypt.hash('demo1234', 12),
+      role: 'user',
+      bio: 'Math enthusiast and puzzle lover',
+      avatar: 'https://api.dicebear.com/8.x/adventurer/svg?seed=bob',
+    },
+    {
+      username: 'charlie_science',
+      email: 'charlie@skilprep.local',
+      passwordHash: await bcrypt.hash('demo1234', 12),
+      role: 'user',
+      bio: 'Science quiz specialist',
+      avatar: 'https://api.dicebear.com/8.x/adventurer/svg?seed=charlie',
+    },
+    {
+      username: 'diana_logic',
+      email: 'diana@skilprep.local',
+      passwordHash: await bcrypt.hash('demo1234', 12),
+      role: 'user',
+      bio: 'Pattern recognition and logic puzzle solver',
+      avatar: 'https://api.dicebear.com/8.x/adventurer/svg?seed=diana',
+    },
+    {
+      username: 'eva_rookie',
+      email: 'eva@skilprep.local',
+      passwordHash: await bcrypt.hash('demo1234', 12),
+      role: 'user',
+      bio: 'New learner account for onboarding demo',
+      avatar: 'https://api.dicebear.com/8.x/adventurer/svg?seed=eva',
+    },
+  ]);
+  const [admin, alice, bob, charlie, diana, eva] = seededUsers;
+  console.log('Created presentation users (admin + 5 learners)');
 
   // Create fields
   const fields = await Field.insertMany([
@@ -168,7 +227,7 @@ async function seed() {
   ]);
 
   // ===== MATH PROBLEMS =====
-  await Problem.insertMany([
+  const mathProblems = await Problem.insertMany([
     {
       title: 'Solve Quadratic Equation',
       slug: 'solve-quadratic',
@@ -205,7 +264,7 @@ async function seed() {
   ]);
 
   // ===== SCIENCE PROBLEMS =====
-  await Problem.insertMany([
+  const scienceProblems = await Problem.insertMany([
     {
       title: "Newton's Second Law",
       slug: 'newtons-second-law',
@@ -269,7 +328,7 @@ async function seed() {
   ]);
 
   // ===== LOGIC PROBLEMS =====
-  await Problem.insertMany([
+  const logicProblems = await Problem.insertMany([
     {
       title: 'Next in Sequence',
       slug: 'next-in-sequence',
@@ -306,7 +365,7 @@ async function seed() {
   ]);
 
   // ===== GENERAL KNOWLEDGE =====
-  await Problem.insertMany([
+  const gkProblems = await Problem.insertMany([
     {
       title: 'World Capitals',
       slug: 'world-capitals',
@@ -370,7 +429,446 @@ async function seed() {
   ]);
 
   const totalProblems = await Problem.countDocuments();
+  const allProblems = [
+    ...codingProblems,
+    ...mathProblems,
+    ...scienceProblems,
+    ...logicProblems,
+    ...gkProblems,
+  ];
+
+  const problemBySlug = new Map(allProblems.map((problem) => [problem.slug, problem]));
+
+  const submissions = await Submission.insertMany([
+    {
+      user: alice._id,
+      problem: problemBySlug.get('two-sum')._id,
+      field: coding._id,
+      answer: { language: 'python', code: 'print([0,1])' },
+      kind: 'submission',
+      status: 'accepted',
+      score: 10,
+      executionTimeMs: 18,
+    },
+    {
+      user: alice._id,
+      problem: problemBySlug.get('valid-parentheses')._id,
+      field: coding._id,
+      answer: { language: 'javascript', code: 'console.log(true)' },
+      kind: 'submission',
+      status: 'accepted',
+      score: 10,
+      executionTimeMs: 29,
+    },
+    {
+      user: alice._id,
+      problem: problemBySlug.get('merge-two-sorted-lists')._id,
+      field: coding._id,
+      answer: { language: 'python', code: 'print([1,1,2,3,4,4])' },
+      kind: 'submission',
+      status: 'accepted',
+      score: 20,
+      executionTimeMs: 34,
+    },
+    {
+      user: bob._id,
+      problem: problemBySlug.get('solve-quadratic')._id,
+      field: math._id,
+      answer: { value: '3' },
+      kind: 'submission',
+      status: 'accepted',
+      score: 10,
+      executionTimeMs: 0,
+    },
+    {
+      user: bob._id,
+      problem: problemBySlug.get('arithmetic-series-sum')._id,
+      field: math._id,
+      answer: { value: '5050' },
+      kind: 'submission',
+      status: 'accepted',
+      score: 20,
+      executionTimeMs: 0,
+    },
+    {
+      user: bob._id,
+      problem: problemBySlug.get('derivative-x-cubed')._id,
+      field: math._id,
+      answer: { value: '3x^2' },
+      kind: 'submission',
+      status: 'accepted',
+      score: 10,
+      executionTimeMs: 0,
+    },
+    {
+      user: charlie._id,
+      problem: problemBySlug.get('newtons-second-law')._id,
+      field: science._id,
+      answer: { choices: [1] },
+      kind: 'submission',
+      status: 'accepted',
+      score: 10,
+      executionTimeMs: 0,
+    },
+    {
+      user: charlie._id,
+      problem: problemBySlug.get('chemical-bonding')._id,
+      field: science._id,
+      answer: { choices: [2] },
+      kind: 'submission',
+      status: 'accepted',
+      score: 20,
+      executionTimeMs: 0,
+    },
+    {
+      user: diana._id,
+      problem: problemBySlug.get('next-in-sequence')._id,
+      field: logic._id,
+      answer: { value: '42' },
+      kind: 'submission',
+      status: 'accepted',
+      score: 10,
+      executionTimeMs: 0,
+    },
+    {
+      user: diana._id,
+      problem: problemBySlug.get('river-crossing')._id,
+      field: logic._id,
+      answer: { value: 'chicken' },
+      kind: 'submission',
+      status: 'accepted',
+      score: 20,
+      executionTimeMs: 0,
+    },
+    {
+      user: diana._id,
+      problem: problemBySlug.get('light-switches')._id,
+      field: logic._id,
+      answer: { value: '2' },
+      kind: 'submission',
+      status: 'accepted',
+      score: 30,
+      executionTimeMs: 0,
+    },
+    {
+      user: eva._id,
+      problem: problemBySlug.get('world-capitals')._id,
+      field: gk._id,
+      answer: { choices: [0] },
+      kind: 'submission',
+      status: 'wrong_answer',
+      score: 0,
+      executionTimeMs: 0,
+    },
+    {
+      user: eva._id,
+      problem: problemBySlug.get('world-capitals')._id,
+      field: gk._id,
+      answer: { choices: [2] },
+      kind: 'submission',
+      status: 'accepted',
+      score: 10,
+      executionTimeMs: 0,
+    },
+    {
+      user: admin._id,
+      problem: problemBySlug.get('nobel-physics')._id,
+      field: gk._id,
+      answer: { choices: [1] },
+      kind: 'submission',
+      status: 'accepted',
+      score: 20,
+      executionTimeMs: 0,
+    },
+  ]);
+
+  await Comment.insertMany([
+    {
+      problem: problemBySlug.get('two-sum')._id,
+      author: alice._id,
+      body: 'Great warm-up problem. Hash map solution works in linear time.',
+      upvotes: 2,
+      downvotes: 0,
+      upvotedBy: [bob._id, eva._id],
+      downvotedBy: [],
+    },
+    {
+      problem: problemBySlug.get('two-sum')._id,
+      author: bob._id,
+      body: 'I started with brute force and then optimized to O(n).',
+      upvotes: 1,
+      downvotes: 0,
+      upvotedBy: [alice._id],
+      downvotedBy: [],
+    },
+    {
+      problem: problemBySlug.get('solve-quadratic')._id,
+      author: bob._id,
+      body: 'Factoring makes this one straightforward.',
+      upvotes: 2,
+      downvotes: 0,
+      upvotedBy: [charlie._id, diana._id],
+      downvotedBy: [],
+    },
+    {
+      problem: problemBySlug.get('newtons-second-law')._id,
+      author: charlie._id,
+      body: 'Mnemonic: Force equals mass times acceleration, always.',
+      upvotes: 3,
+      downvotes: 0,
+      upvotedBy: [alice._id, bob._id, eva._id],
+      downvotedBy: [],
+    },
+    {
+      problem: problemBySlug.get('river-crossing')._id,
+      author: diana._id,
+      body: 'Classic puzzle, the chicken must cross first.',
+      upvotes: 1,
+      downvotes: 0,
+      upvotedBy: [eva._id],
+      downvotedBy: [],
+    },
+  ]);
+
+  const community = await Community.create({
+    slug: 'skilprep-founders-circle',
+    name: 'SkilPrep Founders Circle',
+    description: 'Demo community for tests, shared files, notes, and private result review.',
+    owner: admin._id,
+    members: [admin._id, alice._id, bob._id, charlie._id, diana._id, eva._id],
+    isPublic: false,
+    settings: {
+      resultVisibility: 'members_only',
+      allowFileSharing: true,
+      allowNotes: true,
+    },
+  });
+
+  const communityTest = await CommunityTest.create({
+    community: community._id,
+    title: 'Week 1 Diagnostic Test',
+    description: 'Introductory community assessment for the first cohort.',
+    prompt: 'Explain your approach to solving Two Sum and include one optimization idea.',
+    createdBy: admin._id,
+    isPublished: true,
+  });
+
+  await CommunityResource.insertMany([
+    {
+      community: community._id,
+      kind: 'note',
+      title: 'How we grade community tests',
+      body: 'Creator/admin can review every answer. Students only see their own result in the dashboard.',
+      sharedBy: admin._id,
+    },
+    {
+      community: community._id,
+      kind: 'file',
+      title: 'Study plan PDF',
+      body: 'Shared reference sheet for algorithms and practice schedule.',
+      fileName: 'study-plan.pdf',
+      fileUrl: 'https://example.com/study-plan.pdf',
+      sharedBy: alice._id,
+    },
+  ]);
+
+  await CommunitySubmission.insertMany([
+    {
+      community: community._id,
+      communityTest: communityTest._id,
+      user: alice._id,
+      answer: 'I would use a hash map to store complements and reduce the search to O(n).',
+      score: 94,
+      feedback: 'Clear and correct. Good mention of the optimization.',
+      reviewedBy: admin._id,
+      reviewedAt: new Date(),
+      status: 'reviewed',
+    },
+    {
+      community: community._id,
+      communityTest: communityTest._id,
+      user: bob._id,
+      answer: 'Brute force first, then improve with a lookup table for complements.',
+      score: 88,
+      feedback: 'Solid explanation.',
+      reviewedBy: admin._id,
+      reviewedAt: new Date(),
+      status: 'reviewed',
+    },
+    {
+      community: community._id,
+      communityTest: communityTest._id,
+      user: charlie._id,
+      answer: 'Check each pair and use a faster data structure when scaling up.',
+      score: 82,
+      feedback: 'Good start, be more specific about the data structure.',
+      reviewedBy: admin._id,
+      reviewedAt: new Date(),
+      status: 'reviewed',
+    },
+  ]);
+
+  const userStatsPlan = [
+    {
+      user: alice,
+      stats: {
+        totalSolved: 3,
+        totalScore: 40,
+        currentStreak: 4,
+        longestStreak: 7,
+        lastSolveDate: new Date(),
+        byField: {
+          coding: { solved: 3, score: 40 },
+        },
+      },
+    },
+    {
+      user: bob,
+      stats: {
+        totalSolved: 3,
+        totalScore: 40,
+        currentStreak: 3,
+        longestStreak: 5,
+        lastSolveDate: new Date(),
+        byField: {
+          math: { solved: 3, score: 40 },
+        },
+      },
+    },
+    {
+      user: charlie,
+      stats: {
+        totalSolved: 2,
+        totalScore: 30,
+        currentStreak: 2,
+        longestStreak: 2,
+        lastSolveDate: new Date(),
+        byField: {
+          science: { solved: 2, score: 30 },
+        },
+      },
+    },
+    {
+      user: diana,
+      stats: {
+        totalSolved: 3,
+        totalScore: 60,
+        currentStreak: 5,
+        longestStreak: 6,
+        lastSolveDate: new Date(),
+        byField: {
+          logic: { solved: 3, score: 60 },
+        },
+      },
+    },
+    {
+      user: eva,
+      stats: {
+        totalSolved: 1,
+        totalScore: 10,
+        currentStreak: 1,
+        longestStreak: 1,
+        lastSolveDate: new Date(),
+        byField: {
+          'general-knowledge': { solved: 1, score: 10 },
+        },
+      },
+    },
+    {
+      user: admin,
+      stats: {
+        totalSolved: 1,
+        totalScore: 20,
+        currentStreak: 1,
+        longestStreak: 1,
+        lastSolveDate: new Date(),
+        byField: {
+          'general-knowledge': { solved: 1, score: 20 },
+        },
+      },
+    },
+  ];
+
+  await Promise.all(
+    userStatsPlan.map(({ user, stats }) =>
+      User.updateOne(
+        { _id: user._id },
+        {
+          $set: {
+            stats: {
+              ...stats,
+              byField: new Map(Object.entries(stats.byField)),
+            },
+          },
+        }
+      )
+    )
+  );
+
+  const attemptsByProblem = new Map();
+  const acceptedByProblem = new Map();
+  for (const submission of submissions) {
+    const problemId = submission.problem.toString();
+    attemptsByProblem.set(problemId, (attemptsByProblem.get(problemId) || 0) + 1);
+    if (submission.status === 'accepted') {
+      acceptedByProblem.set(problemId, (acceptedByProblem.get(problemId) || 0) + 1);
+    }
+  }
+
+  await Promise.all(
+    allProblems.map((problem) =>
+      Problem.updateOne(
+        { _id: problem._id },
+        {
+          $set: {
+            attemptCount: attemptsByProblem.get(problem._id.toString()) || 0,
+            solveCount: acceptedByProblem.get(problem._id.toString()) || 0,
+          },
+        }
+      )
+    )
+  );
+
+  const presentationReport = {
+    generatedAt: new Date().toISOString(),
+    mongoDatabase: mongoose.connection.name,
+    counts: {
+      users: await User.countDocuments(),
+      fields: await Field.countDocuments(),
+      problems: await Problem.countDocuments(),
+      testCases: await TestCase.countDocuments(),
+      submissions: await Submission.countDocuments(),
+      comments: await Comment.countDocuments(),
+      communities: await Community.countDocuments(),
+      communityTests: await CommunityTest.countDocuments(),
+      communitySubmissions: await CommunitySubmission.countDocuments(),
+      communityResources: await CommunityResource.countDocuments(),
+    },
+    loginCredentials: [
+      { role: 'admin', username: admin.username, email: admin.email, password: 'admin123', userId: admin._id.toString() },
+      { role: 'user', username: alice.username, email: alice.email, password: 'demo1234', userId: alice._id.toString() },
+      { role: 'user', username: bob.username, email: bob.email, password: 'demo1234', userId: bob._id.toString() },
+      { role: 'user', username: charlie.username, email: charlie.email, password: 'demo1234', userId: charlie._id.toString() },
+      { role: 'user', username: diana.username, email: diana.email, password: 'demo1234', userId: diana._id.toString() },
+      { role: 'user', username: eva.username, email: eva.email, password: 'demo1234', userId: eva._id.toString() },
+    ],
+    keyFieldIds: fields.map((field) => ({ slug: field.slug, id: field._id.toString() })),
+    keyProblemIds: allProblems.map((problem) => ({ slug: problem.slug, id: problem._id.toString(), field: problem.field.toString() })),
+    community: {
+      slug: community.slug,
+      id: community._id.toString(),
+      testId: communityTest._id.toString(),
+    },
+  };
+
+  const reportPath = path.join(__dirname, 'presentation-dataset-report.json');
+  fs.writeFileSync(reportPath, `${JSON.stringify(presentationReport, null, 2)}\n`, 'utf8');
+
   console.log(`Created ${totalProblems} problems`);
+  console.log(`Created ${submissions.length} submissions`);
+  console.log('Created 5 comments');
+  console.log('Created 1 community with shared test and resources');
+  console.log(`Presentation report written to ${reportPath}`);
   console.log('Seed complete!');
   process.exit(0);
 }

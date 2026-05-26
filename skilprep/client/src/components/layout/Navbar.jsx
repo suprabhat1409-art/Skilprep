@@ -46,6 +46,9 @@ export default function Navbar() {
             <Link to="/learning-tracks" className="text-gray-600 hover:text-gray-900 no-underline text-sm font-medium">
               Learning Tracks
             </Link>
+            <Link to="/communities" className="text-gray-600 hover:text-gray-900 no-underline text-sm font-medium">
+              Communities
+            </Link>
             <Link to="/leaderboard" className="text-gray-600 hover:text-gray-900 no-underline text-sm font-medium">
               Leaderboard
             </Link>

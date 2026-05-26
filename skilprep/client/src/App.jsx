@@ -16,6 +16,7 @@ import ProtectedRoute from './components/layout/ProtectedRoute';
 import CodeExecutorPage from './pages/CodeExecutorPage';
 import LearningTracksPage from './pages/LearningTracksPage';
 import WorkspacePage from './pages/WorkspacePage';
+import CommunityPage from './pages/CommunityPage';
 import { AnimatePresence } from 'framer-motion';
 
 const queryClient = new QueryClient({
@@ -48,6 +49,7 @@ function App() {
                     }
                   />
                   <Route path="/learning-tracks" element={<LearningTracksPage />} />
+                  <Route path="/communities" element={<CommunityPage />} />
                   <Route path="/leaderboard" element={<LeaderboardPage />} />
                   <Route path="/profile/:username" element={<ProfilePage />} />
                   <Route
