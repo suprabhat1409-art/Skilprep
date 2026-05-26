@@ -3,8 +3,6 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
 
-const WELCOME_POPUP_SEEN_KEY = 'skilprep_welcome_popup_seen_v1';
-
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } }
@@ -25,21 +23,7 @@ export default function HomePage() {
   const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
-    try {
-      const hasSeenPopup = localStorage.getItem(WELCOME_POPUP_SEEN_KEY) === 'true';
-      if (hasSeenPopup) return;
-    } catch {
-      // If storage is unavailable, fallback to showing popup on mount.
-    }
-
     const timer = window.setTimeout(() => setShowPopup(true), 450);
-
-    try {
-      localStorage.setItem(WELCOME_POPUP_SEEN_KEY, 'true');
-    } catch {
-      // Ignore storage write failures.
-    }
-
     return () => window.clearTimeout(timer);
   }, []);
 
