@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SkilPrep — Project & Developer Report</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;max-width:900px;margin:36px auto;color:#111}
+    h1,h2{color:#0b3d91}
+    pre{background:#f6f8fa;padding:12px;border-radius:6px;overflow:auto}
+    section{margin-bottom:18px}
+    table{border-collapse:collapse;width:100%}
+    th,td{border:1px solid #ddd;padding:8px;text-align:left}
+  </style>
+</head>
+<body>
+  <h1>SkilPrep — Project Synopsis & Developer Report</h1>
+  <section>
+    <h2>Synopsis</h2>
+    <p>SkilPrep is a multi-discipline challenge and learning platform that supports coding, mathematics, science, logic, and general-knowledge exercises. It provides problem authoring, in-browser code editing and execution, automatic and manual evaluation, community tests, shared resources, and instructor (admin) workflows for review and feedback.</p>
+  </section>
+
+  <section>
+    <h2>Architecture</h2>
+    <ul>
+      <li><strong>Client:</strong> React + Vite SPA (dev server at <a href="http://localhost:5173/">http://localhost:5173/</a>).</li>
+      <li><strong>Server/API:</strong> Node.js + Express providing REST endpoints under <code>server/src</code>.</li>
+      <li><strong>Database:</strong> MongoDB with Mongoose models for Users, Problems, Submissions, Communities, Tests, Resources.</li>
+      <li><strong>Sandbox & Evaluators:</strong> Modular evaluators in <code>server/src/evaluators</code> and a sandbox for safe code execution.</li>
+      <li><strong>File uploads:</strong> handled via <code>multer</code> and stored in <code>uploads/</code>.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Tech Stack & Rationale</h2>
+    <ul>
+      <li><strong>React + Vite:</strong> fast dev feedback and modern frontend toolchain.</li>
+      <li><strong>Node + Express:</strong> lightweight REST API framework and large ecosystem.</li>
+      <li><strong>MongoDB + Mongoose:</strong> flexible data models for documents like problems and submissions.</li>
+      <li><strong>Monaco Editor:</strong> production-ready in-browser code editor for coding problems.</li>
+      <li><strong>JWT + bcrypt:</strong> stateless auth plus secure password storage.</li>
+      <li><strong>Evaluators:</strong> separate scoring logic per problem type makes system extensible and safer.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Development Workflow</h2>
+    <ol>
+      <li>Configure environment: create <code>server/.env</code> and set <code>MONGO_URI</code>.</li>
+      <li>Install dependencies for root, <code>server</code>, and <code>client</code>.</li>
+      <li>Run seed data via <code>npm run seed</code> to populate demo users, problems, communities, and tests.</li>
+      <li>Start both dev servers from project root: <code>npm run dev</code> (uses <code>concurrently</code>).</li>
+      <li>Server changes are auto-reloaded by <code>nodemon</code>; client changes are hot-reloaded by Vite.</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Seed / Demo Dataset Summary</h2>
+    <p>The seed script at <code>server/seed/runSeed.js</code> populates a presentation dataset and writes <code>server/seed/presentation-dataset-report.json</code> describing counts and credentials.</p>
+    <table>
+      <tr><th>Item</th><th>Count / Notes</th></tr>
+      <tr><td>Users</td><td>6 (admin + 5 demo learners)</td></tr>
+      <tr><td>Problems</td><td>15 covering coding, math, science, logic, GK</td></tr>
+      <tr><td>Submissions</td><td>14 (mixed accepted & wrong answers)</td></tr>
+      <tr><td>Community</td><td>1 community <em>skilprep-founders-circle</em> (private) with a published test and resources</td></tr>
+    </table>
+    <h3>Admin/demo credentials (from seed)</h3>
+    <pre>
+admin / admin@skilprep.local  password: admin123
+alice_dev / alice@skilprep.local  password: demo1234
+bob_math / bob@skilprep.local      password: demo1234
+charlie_science / charlie@skilprep.local  password: demo1234
+diana_logic / diana@skilprep.local  password: demo1234
+eva_rookie / eva@skilprep.local     password: demo1234
+    </pre>
+  </section>
+
+  <section>
+    <h2>Where to look in the code</h2>
+    <ul>
+      <li><strong>Server entry:</strong> <code>server/src/server.js</code> and <code>server/src/app.js</code>.</li>
+      <li><strong>Routes:</strong> <code>server/src/routes/</code> (auth, problems, community, tests, submissions).</li>
+      <li><strong>Models:</strong> <code>server/src/models/</code> (User, Problem, Submission, Community, etc.).</li>
+      <li><strong>Evaluators:</strong> <code>server/src/evaluators/</code> (MathEvaluator, McqEvaluator, ShortAnswerEvaluator).</li>
+      <li><strong>Seed script:</strong> <code>server/seed/runSeed.js</code> — generates demo data and <code>presentation-dataset-report.json</code>.</li>
+      <li><strong>Client:</strong> <code>client/src/pages</code> and <code>client/src/components</code>.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Next steps & Recommendations</h2>
+    <ul>
+      <li>Secure production environment: use a managed MongoDB, HTTPS, and rotate demo credentials before sharing externally.</li>
+      <li>Harden sandbox execution and resource limits for production workloads.</li>
+      <li>Add automated tests for evaluators and API endpoints.</li>
+      <li>Consider CI pipeline to run linting, tests, and seed verification.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <small>Generated: 2026-05-27</small>
+  </footer>
+</body>
+</html>
