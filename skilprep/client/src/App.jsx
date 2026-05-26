@@ -15,6 +15,7 @@ import AdminDashboardPage from './pages/AdminDashboardPage';
 import ProtectedRoute from './components/layout/ProtectedRoute';
 import CodeExecutorPage from './pages/CodeExecutorPage';
 import LearningTracksPage from './pages/LearningTracksPage';
+import CommunityPage from './pages/CommunityPage';
 import WorkspacePage from './pages/WorkspacePage';
 import { AnimatePresence } from 'framer-motion';
 
@@ -48,6 +49,7 @@ function App() {
                     }
                   />
                   <Route path="/learning-tracks" element={<LearningTracksPage />} />
+                  <Route path="/community" element={<CommunityPage />} />
                   <Route path="/leaderboard" element={<LeaderboardPage />} />
                   <Route path="/profile/:username" element={<ProfilePage />} />
                   <Route
