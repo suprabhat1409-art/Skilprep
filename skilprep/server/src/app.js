@@ -32,6 +32,7 @@ app.use('/api/comments', require('./routes/commentRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/leaderboard', require('./routes/leaderboardRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
+app.use('/api/communities', require('./routes/communityRoutes'));
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
